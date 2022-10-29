@@ -12,12 +12,12 @@ class GameMethods {
     String winner = '';
 
     // Checking rows
-    if (roomDataProvider.filledBoxes == 20) {
-      winner = roomDataProvider.displayElements;
+    if (roomDataProvider.filledBoxes == 21) {
+      winner = roomDataProvider.roomData['turn']['nickname'];
     }
 
     if (winner != '') {
-      if (roomDataProvider.player1.playerType == winner) {
+      if (roomDataProvider.player1.nickname == winner) {
         showGameDialog(context, '${roomDataProvider.player1.nickname} won!');
         socketClent.emit('winner', {
           'winnerSocketId': roomDataProvider.player1.socketID,

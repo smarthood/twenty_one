@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mp_tictactoe/provider/room_data_provider.dart';
 import 'package:mp_tictactoe/resources/socket_methods.dart';
 import 'package:provider/provider.dart';
-import '../Widgets/Custom_Text.dart';
+import '../widgets/custom_text.dart';
 
 class TwentyoneGameBoard extends StatefulWidget {
   const TwentyoneGameBoard({Key? key}) : super(key: key);
@@ -13,7 +13,39 @@ class TwentyoneGameBoard extends StatefulWidget {
 
 class _TicTacToeBoardState extends State<TwentyoneGameBoard> {
   final SocketMethods _socketMethods = SocketMethods();
+  late bool isIncButtonDisable;
+  late bool isDecButtonDisable;
+  @override
+  int increment(int count, roomDataProvider) {
+    if (temp >= 2) {
+      isDecButtonDisable = true;
+    } else {
+      setState(() {
+        isDecButtonDisable = false;
+        temp++;
+        count += temp;
+      });
+    }
+    return 0;
+  }
 
+  @override
+  int decrement(int count, roomDataProvider) {
+    if (temp <= 0) {
+      isDecButtonDisable = true;
+    } else {
+      setState(() {
+        isDecButtonDisable = false;
+        temp--;
+        count += temp;
+      });
+    }
+
+    print(count);
+    return 0;
+  }
+
+  int temp = 0;
   @override
   void initState() {
     super.initState();
@@ -22,47 +54,22 @@ class _TicTacToeBoardState extends State<TwentyoneGameBoard> {
     _socketMethods.tappedListener(context);
   }
 
-  void tapped(int count, RoomDataProvider roomDataProvider) {
-    _socketMethods.tapGrid(
-      roomDataProvider.roomData['_id'],
-      count,
-    );
-  }
-
-  int count = 0;
-  late bool isIncButtonDisable;
-  late bool isDecButtonDisable;
-
-  @override
-  void increment() {
+  void tapped(RoomDataProvider roomDataProvider) {
+    _socketMethods.tapGrid(temp, roomDataProvider.roomData['_id']);
     setState(() {
-      if (count == -1) {
-        isDecButtonDisable = true;
-      } else {
-        isDecButtonDisable = false;
-      }
-      count++;
+      temp = 0;
     });
-    print(count);
+    print(temp);
   }
 
-  @override
-  void decrement() {
-    setState(() {
-      if (count <= 1) {
-        isDecButtonDisable = true;
-      } else {
-        isDecButtonDisable = false;
-      }
-      count--;
-    });
-  }
+  void change(RoomDataProvider roomDataProvider) {}
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    RoomDataProvider roomDataProvider = Provider.of<RoomDataProvider>(context);
 
+    RoomDataProvider roomDataProvider = Provider.of<RoomDataProvider>(context);
+    int count = roomDataProvider.filledBoxes.toInt();
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxHeight: size.height * 0.7,
@@ -76,7 +83,9 @@ class _TicTacToeBoardState extends State<TwentyoneGameBoard> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               IconButton(
-                  onPressed: () => increment(),
+                  onPressed: () => isIncButtonDisable
+                      ? null
+                      : increment(count, roomDataProvider),
                   iconSize: 100,
                   icon: Icon(
                     Icons.arrow_drop_up,
@@ -86,15 +95,17 @@ class _TicTacToeBoardState extends State<TwentyoneGameBoard> {
                   blurRadius: 40,
                   color: Colors.purple,
                 )
-              ], text: '$count', fontSize: 120),
+              ], text: (count + temp).toString(), fontSize: 120),
               IconButton(
-                  onPressed: isDecButtonDisable ? null : decrement,
+                  onPressed: () => isDecButtonDisable
+                      ? null
+                      : decrement(count, roomDataProvider),
                   iconSize: 100,
                   icon: Icon(
                     Icons.arrow_drop_down,
                   )),
               TextButton(
-                onPressed: () {},
+                onPressed: () => tapped(roomDataProvider),
                 child: Text("Pass"),
                 style: TextButton.styleFrom(
                     foregroundColor: Colors.white,

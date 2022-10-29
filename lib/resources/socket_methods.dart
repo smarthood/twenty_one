@@ -30,11 +30,8 @@ class SocketMethods {
     }
   }
 
-  void tapGrid(String roomId, int filledBoxes) {
-    if (filledBoxes <= 20 && filledBoxes >= 0) {
-      filledBoxes++;
-      _socketClient.emit('inc', {'roomId': roomId, 'filledBoxes': filledBoxes});
-    }
+  void tapGrid(int temp,String roomId) {
+    _socketClient.emit('tap', {'temp': temp,'roomId': roomId});
   }
 
   // LISTENERS
@@ -82,9 +79,7 @@ class SocketMethods {
     _socketClient.on('tapped', (data) {
       RoomDataProvider roomDataProvider =
           Provider.of<RoomDataProvider>(context, listen: false);
-      roomDataProvider.updateDisplayElements(
-        data['filledBoxes'],
-      );
+      roomDataProvider.updateDisplayElements(data['temp']);
       roomDataProvider.updateRoomData(data['room']);
       // check winnner
       GameMethods().checkWinner(context, _socketClient);

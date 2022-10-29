@@ -3,7 +3,7 @@ import 'package:mp_tictactoe/models/player.dart';
 
 class RoomDataProvider extends ChangeNotifier {
   Map<String, dynamic> _roomData = {};
-  String _displayElement ='';
+  String _displayElement = '';
   int _filledBoxes = 0;
   Player _player1 = Player(
     nickname: '',
@@ -40,9 +40,8 @@ class RoomDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateDisplayElements( String choice) {
-    _displayElement = choice;
-    _filledBoxes += 1;
+  void updateDisplayElements(int temp) {
+    _filledBoxes += temp;
     notifyListeners();
   }
 

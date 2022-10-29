@@ -74,10 +74,9 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("tap", async ({ index, roomId }) => {
+  socket.on("tap", async ({ roomId,temp }) => {
     try {
       let room = await Room.findById(roomId);
-
       let choice = room.turn.playerType; // x or o
       if (room.turnIndex == 0) {
         room.turn = room.players[1];
@@ -88,9 +87,8 @@ io.on("connection", (socket) => {
       }
       room = await room.save();
       io.to(roomId).emit("tapped", {
-        index,
-        choice,
-        room,
+        temp,
+        room
       });
     } catch (e) {
       console.log(e);
