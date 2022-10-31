@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mp_tictactoe/provider/room_data_provider.dart';
 import 'package:mp_tictactoe/responsive/responsive.dart';
 import 'package:mp_tictactoe/widgets/custom_textfield.dart';
 import 'package:provider/provider.dart';
+import 'package:whatsapp_share/whatsapp_share.dart';
 
 class WaitingLobby extends StatefulWidget {
   const WaitingLobby({Key? key}) : super(key: key);
@@ -13,7 +15,6 @@ class WaitingLobby extends StatefulWidget {
 
 class _WaitingLobbyState extends State<WaitingLobby> {
   late TextEditingController roomIdController;
-
   @override
   void initState() {
     super.initState();
@@ -41,6 +42,30 @@ class _WaitingLobbyState extends State<WaitingLobby> {
             controller: roomIdController,
             hintText: '',
             isReadOnly: true,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                  onPressed: () async {
+                    await Clipboard.setData(ClipboardData(
+                        text: Provider.of<RoomDataProvider>(context,
+                                listen: false)
+                            .roomData['_id']));
+                    // copied successfully
+                  },
+                  icon: Icon(Icons.copy)),
+              IconButton(
+                  onPressed: () async {
+                    await WhatsappShare.share(
+                      text:
+                          Provider.of<RoomDataProvider>(context, listen: false)
+                              .roomData['_id'],
+                      phone: '911234567890',
+                    );
+                  },
+                  icon: Icon(Icons.share))
+            ],
           ),
         ],
       ),
